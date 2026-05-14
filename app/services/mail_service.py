@@ -34,8 +34,13 @@ class MailService:
             if not self.config.get('SMTP_SERVER') or not self.config.get('SMTP_USERNAME'):
                 return False, "SMTP configuration missing"
             
-            server = smtplib.SMTP(self.config['SMTP_SERVER'], self.config['SMTP_PORT'], timeout=5)
-            server.starttls()
+            port = int(self.config.get('SMTP_PORT', 587))
+            if port == 465:
+                server = smtplib.SMTP_SSL(self.config['SMTP_SERVER'], port, timeout=15)
+            else:
+                server = smtplib.SMTP(self.config['SMTP_SERVER'], port, timeout=15)
+                server.starttls()
+
             server.login(self.config['SMTP_USERNAME'], self.config['SMTP_PASSWORD'])
             server.quit()
             return True, "Connection Successful"
@@ -64,8 +69,13 @@ class MailService:
                             )
                             msg.attach(part)
 
-            server = smtplib.SMTP(self.config['SMTP_SERVER'], self.config['SMTP_PORT'])
-            server.starttls()
+            port = int(self.config.get('SMTP_PORT', 587))
+            if port == 465:
+                server = smtplib.SMTP_SSL(self.config['SMTP_SERVER'], port, timeout=15)
+            else:
+                server = smtplib.SMTP(self.config['SMTP_SERVER'], port, timeout=15)
+                server.starttls()
+
             server.login(self.config['SMTP_USERNAME'], self.config['SMTP_PASSWORD'])
             server.send_message(msg)
             server.quit()

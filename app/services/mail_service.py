@@ -100,14 +100,14 @@ class MailService:
             return False, str(e)
 
     def process_campaign(self, campaign_id, recipients, subject_template, body_template, delay=2, provider='smtp'):
-        from app.extensions import socketio, db
+        from app import extensions as ext
         from bson import ObjectId
         
         total = len(recipients)
         sent = 0
         failed = 0
         
-        db.campaigns.update_one({'_id': ObjectId(campaign_id)}, {'$set': {'status': 'processing'}})
+        ext.db.campaigns.update_one({'_id': ObjectId(campaign_id)}, {'$set': {'status': 'processing'}})
         
         for index, recipient in enumerate(recipients):
             # Personalization
@@ -137,7 +137,7 @@ class MailService:
             
             # Update stats
             progress = int(((index + 1) / total) * 100)
-            socketio.emit('campaign_progress', {
+            ext.socketio.emit('campaign_progress', {
                 'campaign_id': str(campaign_id),
                 'progress': progress,
                 'sent': sent,
@@ -147,7 +147,7 @@ class MailService:
             # Anti-spam delay
             time.sleep(delay)
             
-        db.campaigns.update_one({'_id': ObjectId(campaign_id)}, {
+        ext.db.campaigns.update_one({'_id': ObjectId(campaign_id)}, {
             '$set': {
                 'status': 'completed',
                 'sent_count': sent,
@@ -155,4 +155,4 @@ class MailService:
                 'completed_at': time.time()
             }
         })
-        socketio.emit('campaign_completed', {'campaign_id': str(campaign_id)})
+        ext.socketio.emit('campaign_completed', {'campaign_id': str(campaign_id)})

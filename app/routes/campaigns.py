@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
-from app.extensions import db, scheduler
+from app import extensions as ext
+from app.extensions import scheduler
 from app.services.mail_service import MailService
 from config import Config
 import pandas as pd
@@ -51,7 +52,7 @@ def create_campaign():
         'scheduled_at': scheduled_at_str
     }
     
-    result = db.campaigns.insert_one(campaign)
+    result = ext.db.campaigns.insert_one(campaign)
     campaign_id = str(result.inserted_id)
     
     # Scheduling logic
@@ -68,7 +69,7 @@ def create_campaign():
                     run_date=run_date,
                     args=(campaign_id, recipients, campaign['subject'], campaign['body'], campaign['delay'], campaign['provider'])
                 )
-                db.campaigns.update_one({'_id': ObjectId(campaign_id)}, {'$set': {'status': 'scheduled'}})
+                ext.db.campaigns.update_one({'_id': ObjectId(campaign_id)}, {'$set': {'status': 'scheduled'}})
                 return jsonify({'message': 'Campaign scheduled', 'campaign_id': campaign_id}), 201
         except Exception as e:
             print(f"Scheduling error: {e}")
@@ -86,7 +87,7 @@ def create_campaign():
 
 @campaign_bp.route('/track/<campaign_id>/<email>', methods=['GET'])
 def track_open(campaign_id, email):
-    db.campaigns.update_one(
+    ext.db.campaigns.update_one(
         {'_id': ObjectId(campaign_id)},
         {'$addToSet': {'opened_by': email}}
     )
@@ -96,7 +97,7 @@ def track_open(campaign_id, email):
 
 @campaign_bp.route('/stats', methods=['GET'])
 def get_stats():
-    campaigns = list(db.campaigns.find().sort('created_at', -1))
+    campaigns = list(ext.db.campaigns.find().sort('created_at', -1))
     for c in campaigns:
         c['_id'] = str(c['_id'])
     return jsonify(campaigns)

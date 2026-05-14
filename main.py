@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 import os
 from flask import Flask, jsonify
 from flask_cors import CORS
@@ -93,4 +96,4 @@ app = create_app()
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
     print(f"Server running on http://localhost:{port}")
-    socketio.run(app, debug=True, port=port, allow_unsafe_werkzeug=True, use_reloader=False)
+    socketio.run(app, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True, use_reloader=False)

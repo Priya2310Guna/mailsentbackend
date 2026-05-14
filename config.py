@@ -21,3 +21,6 @@ class Config:
     # API Settings (Brevo/SendGrid)
     BREVO_API_KEY = os.getenv('BREVO_API_KEY')
     SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+    
+    # Base URL for tracking pixels
+    BASE_URL = os.getenv('BASE_URL', 'http://127.0.0.1:5000')

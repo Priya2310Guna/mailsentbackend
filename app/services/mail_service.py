@@ -120,7 +120,8 @@ class MailService:
             personalized_subject = Template(subject_template).render(name=name)
             
             # Inject tracking pixel
-            tracking_pixel = f'<img src="http://127.0.0.1:5000/api/campaigns/track/{campaign_id}/{email}" width="1" height="1" />'
+            base_url = self.config.get('BASE_URL', 'http://127.0.0.1:5000')
+            tracking_pixel = f'<img src="{base_url}/api/campaigns/track/{campaign_id}/{email}" width="1" height="1" />'
             personalized_body = Template(body_template).render(name=name) + tracking_pixel
             
             success, message = (True, "Sent")

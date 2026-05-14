@@ -39,13 +39,15 @@ class MailService:
             
             try:
                 if port == 465:
-                    server = smtplib.SMTP_SSL(self.config['SMTP_SERVER'], port, timeout=20)
+                    server = smtplib.SMTP_SSL(self.config['SMTP_SERVER'], port, timeout=25)
                 else:
-                    server = smtplib.SMTP(self.config['SMTP_SERVER'], port, timeout=20)
+                    server = smtplib.SMTP(self.config['SMTP_SERVER'], port, timeout=25)
+                    server.ehlo()
                     server.starttls()
+                    server.ehlo()
             except Exception as e:
                 if port == 587:
-                    server = smtplib.SMTP_SSL(self.config['SMTP_SERVER'], 465, timeout=20)
+                    server = smtplib.SMTP_SSL(self.config['SMTP_SERVER'], 465, timeout=25)
                 else:
                     raise e
 
@@ -82,13 +84,15 @@ class MailService:
             
             try:
                 if port == 465:
-                    server = smtplib.SMTP_SSL(self.config['SMTP_SERVER'], port, timeout=20)
+                    server = smtplib.SMTP_SSL(self.config['SMTP_SERVER'], port, timeout=25)
                 else:
-                    server = smtplib.SMTP(self.config['SMTP_SERVER'], port, timeout=20)
+                    server = smtplib.SMTP(self.config['SMTP_SERVER'], port, timeout=25)
+                    server.ehlo()
                     server.starttls()
+                    server.ehlo()
             except Exception as e:
                 if port == 587:
-                    server = smtplib.SMTP_SSL(self.config['SMTP_SERVER'], 465, timeout=20)
+                    server = smtplib.SMTP_SSL(self.config['SMTP_SERVER'], 465, timeout=25)
                 else:
                     raise e
 

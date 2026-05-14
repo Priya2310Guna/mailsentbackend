@@ -95,5 +95,5 @@ app = create_app()
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
-    print(f"Server running on http://localhost:{port}")
+    print(f"Server starting on port {port}...")
     socketio.run(app, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True, use_reloader=False)

@@ -34,13 +34,19 @@ def create_app():
         return jsonify(error="Internal Server Error"), 500
     
     try:
-        db_client = MongoClient(app.config['MONGO_URI'], serverSelectionTimeoutMS=2000)
+        # Check if we are on Render and using localhost (which will fail)
+        mongo_uri = app.config.get('MONGO_URI', '')
+        if os.getenv('RENDER') and 'localhost' in mongo_uri:
+            print("Render detected: Skipping localhost MongoDB connection...")
+            raise ConnectionError("No remote MongoDB URI provided for Render environment.")
+
+        db_client = MongoClient(mongo_uri, serverSelectionTimeoutMS=2000)
         db_client.server_info()
         ext.db = db_client.get_database()
         fallback_active = False
         print("MongoDB connected successfully")
     except Exception as e:
-        print(f"MongoDB connection failed: {e}")
+        print(f"Database status: {e}")
         print("Switching to local SQLite fallback...")
         from app.mock_db import SQLiteDB
         ext.db = SQLiteDB(os.path.join(app.config['UPLOAD_FOLDER'], 'local_data.db'))

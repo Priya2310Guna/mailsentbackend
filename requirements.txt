@@ -1,0 +1,11 @@
+flask
+flask-cors
+flask-socketio
+pymongo
+python-dotenv
+pandas
+openpyxl
+requests
+jinja2
+apscheduler
+eventlet

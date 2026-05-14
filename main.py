@@ -33,6 +33,10 @@ def create_app():
         print(f"Unhandled Exception: {e}")
         return jsonify(error="Internal Server Error"), 500
     
+    # Ensure upload directory exists before database initialization
+    if not os.path.exists(app.config['UPLOAD_FOLDER']):
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    
     try:
         # Check if we are on Render and using localhost (which will fail)
         mongo_uri = app.config.get('MONGO_URI', '')
@@ -52,10 +56,6 @@ def create_app():
         ext.db = SQLiteDB(os.path.join(app.config['UPLOAD_FOLDER'], 'local_data.db'))
         fallback_active = True
         print("SQLite fallback active")
-    
-    # Ensure upload directory exists
-    if not os.path.exists(app.config['UPLOAD_FOLDER']):
-        os.makedirs(app.config['UPLOAD_FOLDER'])
     
     # Register Blueprints
     from app.routes.campaigns import campaign_bp

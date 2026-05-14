@@ -35,11 +35,19 @@ class MailService:
                 return False, "SMTP configuration missing"
             
             port = int(self.config.get('SMTP_PORT', 587))
-            if port == 465:
-                server = smtplib.SMTP_SSL(self.config['SMTP_SERVER'], port, timeout=15)
-            else:
-                server = smtplib.SMTP(self.config['SMTP_SERVER'], port, timeout=15)
-                server.starttls()
+            server = None
+            
+            try:
+                if port == 465:
+                    server = smtplib.SMTP_SSL(self.config['SMTP_SERVER'], port, timeout=20)
+                else:
+                    server = smtplib.SMTP(self.config['SMTP_SERVER'], port, timeout=20)
+                    server.starttls()
+            except Exception as e:
+                if port == 587:
+                    server = smtplib.SMTP_SSL(self.config['SMTP_SERVER'], 465, timeout=20)
+                else:
+                    raise e
 
             server.login(self.config['SMTP_USERNAME'], self.config['SMTP_PASSWORD'])
             server.quit()
@@ -70,11 +78,19 @@ class MailService:
                             msg.attach(part)
 
             port = int(self.config.get('SMTP_PORT', 587))
-            if port == 465:
-                server = smtplib.SMTP_SSL(self.config['SMTP_SERVER'], port, timeout=15)
-            else:
-                server = smtplib.SMTP(self.config['SMTP_SERVER'], port, timeout=15)
-                server.starttls()
+            server = None
+            
+            try:
+                if port == 465:
+                    server = smtplib.SMTP_SSL(self.config['SMTP_SERVER'], port, timeout=20)
+                else:
+                    server = smtplib.SMTP(self.config['SMTP_SERVER'], port, timeout=20)
+                    server.starttls()
+            except Exception as e:
+                if port == 587:
+                    server = smtplib.SMTP_SSL(self.config['SMTP_SERVER'], 465, timeout=20)
+                else:
+                    raise e
 
             server.login(self.config['SMTP_USERNAME'], self.config['SMTP_PASSWORD'])
             server.send_message(msg)
